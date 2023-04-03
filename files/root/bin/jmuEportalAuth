@@ -33,7 +33,7 @@ showHelp() {
 # 判断是否已联网
 isOnline() {
     # 已在线时以0结束
-    captiveReturnCode=`curl -s -I -m 10 -o /dev/null -s -w %{http_code} ${url_generate_204}`
+    captiveReturnCode=$(curl -s -I -m 10 -o /dev/null -s -w %{http_code} ${url_generate_204})
     if [ "${captiveReturnCode}" != "200" ]; then
         return 1
     else
@@ -53,8 +53,8 @@ doLogout() {
         echo " -- 已下线 "
     elif [ $? == 1 ]; then
         echo " -- 正在执行下线..."
-        userIndex=`curl -s -A ${user_agent} -I ${eportal_base}redirectortosuccess.jsp | grep -o 'userIndex=.*'`
-        logoutResult=`curl -s -A ${user_agent} -d "${userIndex}" ${eportal_base}InterFace.do?method=logout | awk -F , '{print $2}' | awk -F : '{print $2}' | awk -F \" '{print $2}'`
+        userIndex=$(curl -s -A ${user_agent} -I ${eportal_base}redirectortosuccess.jsp | grep -o 'userIndex=.*')
+        logoutResult=$(curl -s -A ${user_agent} -d "${userIndex}" ${eportal_base}InterFace.do?method=logout | awk -F , '{print $2}' | awk -F : '{print $2}' | awk -F \" '{print $2}')
         echo " -- ${logoutResult}"
         exit 0
     fi
@@ -100,20 +100,20 @@ startAuth() {
         echo " -- 运营商服务: ${service_name}"
 
         # 访问页面，跳转认证页面
-        loginPageURL=`curl -s ${url_generate_204} | awk -F \' '{print $2}'`
-        
+        loginPageURL=$(curl -s ${url_generate_204} | awk -F \' '{print $2}')
+
         # Structure loginURL
-        loginURL=`echo $loginPageURL | awk -F \? '{print $1}'`
+        loginURL=$(echo $loginPageURL | awk -F \? '{print $1}')
         loginURL="${loginURL/index.jsp/InterFace.do?method=login}"
-        
+
         # Structure quertString
-        queryString=`echo $loginPageURL | awk -F \? '{print $2}'`
+        queryString=$(echo $loginPageURL | awk -F \? '{print $2}')
         queryString="${queryString//&/%2526}"
         queryString="${queryString//=/%253D}"
-        
+
         # 发起登录请求
         if [ -n "${loginURL}" ]; then
-            authMessage=`curl -s -A "${user_agent}" -e "${loginPageURL}" -b "EPORTAL_COOKIE_USERNAME=; EPORTAL_COOKIE_PASSWORD=; EPORTAL_COOKIE_SERVER=; EPORTAL_COOKIE_SERVER_NAME=; EPORTAL_AUTO_LAND=; EPORTAL_USER_GROUP=%E5%AD%A6%E7%94%9F%E5%8C%85%E6%9C%88; EPORTAL_COOKIE_OPERATORPWD=;" -d "userId=${param_username}&password=${param_password}&service=${service}&queryString=${queryString}&operatorPwd=&operatorUserId=&validcode=&passwordEncrypt=false" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" "${loginURL}" | awk -F , '{print $3}' | awk -F : '{print $2}' | awk -F \" '{print $2}'`
+            authMessage=$(curl -s -A "${user_agent}" -e "${loginPageURL}" -b "EPORTAL_COOKIE_USERNAME=; EPORTAL_COOKIE_PASSWORD=; EPORTAL_COOKIE_SERVER=; EPORTAL_COOKIE_SERVER_NAME=; EPORTAL_AUTO_LAND=; EPORTAL_USER_GROUP=%E5%AD%A6%E7%94%9F%E5%8C%85%E6%9C%88; EPORTAL_COOKIE_OPERATORPWD=;" -d "userId=${param_username}&password=${param_password}&service=${service}&queryString=${queryString}&operatorPwd=&operatorUserId=&validcode=&passwordEncrypt=false" -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8" -H "Content-Type: application/x-www-form-urlencoded; charset=UTF-8" "${loginURL}" | awk -F , '{print $3}' | awk -F : '{print $2}' | awk -F \" '{print $2}')
             if [ "${authMessage}" == "" ]; then
                 echo " -- 认证成功"
             else
@@ -129,12 +129,11 @@ startAuth() {
 # 通过-r参数 读取config自动认证
 retryAuth() {
     echo " -- 开始重新认证..."
-    param_service=`sed -n "/option services/p" $config_file | awk -F \' '{print $2}'`
-    param_username=`sed -n "/option username/p" $config_file | awk -F \' '{print $2}'`
-    param_password=`sed -n "/option password/p" $config_file | awk -F \' '{print $2}'`
+    param_service=$(sed -n "/option services/p" $config_file | awk -F \' '{print $2}')
+    param_username=$(sed -n "/option username/p" $config_file | awk -F \' '{print $2}')
+    param_password=$(sed -n "/option password/p" $config_file | awk -F \' '{print $2}')
 
-    if [ "${param_service}" != "" ] && [ "${param_username}" != "" ] && [ "${param_password}" != "" ] && [ "${_do_nothing_with_login_}" == 0 ]
-    then
+    if [ "${param_service}" != "" ] && [ "${param_username}" != "" ] && [ "${param_password}" != "" ] && [ "${_do_nothing_with_login_}" == 0 ]; then
         startAuth
     else
         echo " -- 错误: 未配置认证参数 "
@@ -142,8 +141,7 @@ retryAuth() {
 }
 
 # 监听参数传入
-while getopts "crkhs:u:p:" arg
-do
+while getopts "crkhs:u:p:" arg; do
     case $arg in
         c)
             _do_nothing_with_login_=1
@@ -185,8 +183,7 @@ done
 shift $(($OPTIND - 1))
 
 # 当所有参数齐全后，开始认证过程
-if [ "${param_service}" != "" ] && [ "${param_username}" != "" ] && [ "${param_password}" != "" ] && [ "${_do_nothing_with_login_}" == 0 ]
-then
+if [ "${param_service}" != "" ] && [ "${param_username}" != "" ] && [ "${param_password}" != "" ] && [ "${_do_nothing_with_login_}" == 0 ]; then
     startAuth
 elif [ "${_do_nothing_with_login_}" == 1 ]; then
     exit 0
