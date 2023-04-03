@@ -41,11 +41,6 @@ isOnline() {
     fi
 }
 
-# 显示提示消息并以0终止
-setCrontab() {
-    touch /etc/crontabs/root
-}
-
 # 执行下线动作并以0终止
 doLogout() {
     isOnline
@@ -143,10 +138,6 @@ retryAuth() {
 # 监听参数传入
 while getopts "crkhs:u:p:" arg; do
     case $arg in
-        c)
-            _do_nothing_with_login_=1
-            setCrontab
-            ;;
         r)
             _is_auto_reauth_=1
             retryAuth
