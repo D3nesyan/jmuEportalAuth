@@ -69,15 +69,15 @@ startAuth() {
         # 教育网接入
         service_ca="%25E6%2595%2599%25E8%2582%25B2%25E7%25BD%2591%25E6%258E%25A5%25E5%2585%25A5"
         service_name_ca="教育网接入"
-        # 电信宽带接入
-        service_ct="%25E7%2594%25B5%25E4%25BF%25A1%25E5%25AE%25BD%25E5%25B8%25A6%25E6%258E%25A5%25E5%2585%25A5"
-        service_name_ct="电信宽带接入"
         # 联通宽带接入
         service_cu="%25E8%2581%2594%25E9%2580%259A%25E5%25AE%25BD%25E5%25B8%25A6%25E6%258E%25A5%25E5%2585%25A5"
         service_name_cu="联通宽带接入"
         # 移动宽带接入
         service_cm="%25E7%25A7%25BB%25E5%258A%25A8%25E5%25AE%25BD%25E5%25B8%25A6%25E6%258E%25A5%25E5%2585%25A5"
         service_name_cm="移动宽带接入"
+        # 电信宽带接入
+        service_ct="%25E7%2594%25B5%25E4%25BF%25A1%25E5%25AE%25BD%25E5%25B8%25A6%25E6%258E%25A5%25E5%2585%25A5"
+        service_name_ct="电信宽带接入"
 
         service=""
         service_name=""
@@ -86,14 +86,14 @@ startAuth() {
             service=${service_ca}
             service_name=${service_name_ca}
         elif [ ${param_service} == "1" ]; then
-            service=${service_ct}
-            service_name=${service_name_ct}
-        elif [ ${param_service} == "2" ]; then
             service=${service_cu}
             service_name=${service_name_cu}
-        elif [ ${param_service} == "3" ]; then
+        elif [ ${param_service} == "2" ]; then
             service=${service_cm}
             service_name=${service_name_cm}
+        elif [ ${param_service} == "3" ]; then
+            service=${service_ct}
+            service_name=${service_name_ct}
         fi
 
         echo " -- 用户名　　: ${param_username}"
